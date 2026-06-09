@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { NavUser } from '@/components/nav-user';
+import { NotificationBell } from '@/components/notification-bell';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -12,6 +13,7 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import {
   ChartHistogramIcon, Folder01Icon, UserGroupIcon,
   CheckmarkSquare02Icon, TaskDone01Icon, ListViewIcon,
+  BubbleChatIcon,
 } from '@hugeicons/core-free-icons';
 import { SessionUser } from '@/lib/auth';
 
@@ -27,6 +29,7 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
     { title: 'Mis Tareas', url: '/my-tasks', icon: ListViewIcon, roles: ['USER'] },
     { title: 'Transacciones', url: '/transactions', icon: ChartHistogramIcon, roles: ['ADMIN', 'USER'] },
     { title: 'Proyectos', url: '/projects', icon: Folder01Icon, roles: ['ADMIN', 'USER'] },
+    { title: 'Chat', url: '/chat', icon: BubbleChatIcon, roles: ['ADMIN', 'USER'] },
     { title: 'Usuarios', url: '/users', icon: UserGroupIcon, roles: ['ADMIN'] },
   ];
 
@@ -35,21 +38,18 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
   return (
     <Sidebar collapsible='offcanvas' {...props}>
       <SidebarHeader className='border-b border-border/60 px-4 py-4'>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild className='h-auto hover:bg-transparent'>
-              <Link href={user.role === 'ADMIN' ? '/tasks' : '/my-tasks'} className='flex items-center gap-3'>
-                <div className='flex h-9 w-9 items-center justify-center rounded-xl bg-primary shadow-sm'>
-                  <HugeiconsIcon icon={CheckmarkSquare02Icon} strokeWidth={2} className='size-5 text-primary-foreground' />
-                </div>
-                <div className='flex flex-col leading-tight'>
-                  <span className='text-sm font-bold tracking-tight text-foreground'>TaskFlow</span>
-                  <span className='text-[11px] text-muted-foreground'>Gestión de proyectos</span>
-                </div>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        <div className='flex items-center gap-2'>
+          <Link href={user.role === 'ADMIN' ? '/tasks' : '/my-tasks'} className='flex items-center gap-3 flex-1 min-w-0'>
+            <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary shadow-sm'>
+              <HugeiconsIcon icon={CheckmarkSquare02Icon} strokeWidth={2} className='size-5 text-primary-foreground' />
+            </div>
+            <div className='flex flex-col leading-tight min-w-0'>
+              <span className='text-sm font-bold tracking-tight text-foreground'>TaskFlow</span>
+              <span className='text-[11px] text-muted-foreground'>Gestión de proyectos</span>
+            </div>
+          </Link>
+          <NotificationBell />
+        </div>
       </SidebarHeader>
 
       <SidebarContent className='px-3 py-4'>

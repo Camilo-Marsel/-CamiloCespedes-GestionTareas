@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
+import { createNotification } from '@/lib/notifications';
 
 const include = {
   project: { select: { id: true, name: true } },
@@ -56,6 +57,16 @@ export async function POST(request: NextRequest) {
     },
     include,
   });
+
+  if (assigneeId) {
+    const project = await prisma.project.findUnique({ where: { id: projectId }, select: { name: true } });
+    await createNotification(
+      assigneeId,
+      'TASK_ASSIGNED',
+      `Se te asignó la tarea "${title}" en el proyecto "${project?.name ?? ''}"`,
+      task.id
+    );
+  }
 
   return NextResponse.json({ task }, { status: 201 });
 }

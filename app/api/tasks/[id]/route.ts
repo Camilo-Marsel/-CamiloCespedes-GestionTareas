@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
+import { createNotification, notifyAdmins } from '@/lib/notifications';
 
 const include = {
   project: { select: { id: true, name: true } },
@@ -36,6 +37,11 @@ export async function PUT(
       data: { status: 'COMPLETION_REQUESTED' },
       include,
     });
+    await notifyAdmins(
+      'COMPLETION_REQUESTED',
+      `${session.name} solicitó completar la tarea "${task.title}"`,
+      id
+    );
     return NextResponse.json({ task: updated });
   }
 
@@ -61,6 +67,32 @@ export async function PUT(
   }
 
   const updated = await prisma.task.update({ where: { id }, data, include });
+
+  // Notificar al asignado cuando se aprueba o rechaza
+  if (action === 'approve' && task.assigneeId) {
+    await createNotification(
+      task.assigneeId,
+      'TASK_APPROVED',
+      `Tu tarea "${task.title}" fue aprobada`,
+      id
+    );
+  } else if (action === 'reject' && task.assigneeId) {
+    await createNotification(
+      task.assigneeId,
+      'TASK_REJECTED',
+      `Tu tarea "${task.title}" fue rechazada — revísala y vuelve a enviarla`,
+      id
+    );
+  } else if (action === 'assign' && assigneeId) {
+    const project = await prisma.project.findUnique({ where: { id: task.projectId }, select: { name: true } });
+    await createNotification(
+      assigneeId,
+      'TASK_ASSIGNED',
+      `Se te asignó la tarea "${task.title}" en el proyecto "${project?.name ?? ''}"`,
+      id
+    );
+  }
+
   return NextResponse.json({ task: updated });
 }
 
