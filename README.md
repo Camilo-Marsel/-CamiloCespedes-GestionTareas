@@ -1,6 +1,48 @@
 # TaskFlow — Sistema de Gestión de Tareas
 
-Sistema web fullstack para gestionar proyectos, tareas, equipos y comunicación interna. Construido con **Next.js 16**, **Prisma 7**, **PostgreSQL (Supabase)** y **shadcn/ui**.
+**TaskFlow** es una aplicación web fullstack para la gestión de proyectos y equipos de trabajo. Permite crear proyectos, asignar tareas a los miembros del equipo, hacer seguimiento del progreso, registrar movimientos financieros por proyecto, y comunicarse en tiempo real a través de un chat grupal. Está diseñada con dos roles diferenciados — administrador y usuario — cada uno con acceso y capacidades distintas.
+
+Construida con **Next.js 16**, **Prisma 7**, **PostgreSQL (Supabase)** y **shadcn/ui**.
+
+---
+
+## ¿Qué puede hacer cada rol?
+
+### ADMIN
+- Crear, asignar, aprobar y rechazar tareas en cualquier proyecto
+- Ver todas las tareas del sistema con filtros por estado y proyecto
+- Crear nuevos proyectos
+- Registrar movimientos de entrada/salida en cualquier proyecto y ver la gráfica de saldo
+- Gestionar usuarios: ver todos los usuarios, cambiar roles, activar o desactivar cuentas
+- Ver el historial completo de todas las tareas
+- Participar en el chat de cualquier proyecto
+- Recibir notificaciones cuando un usuario solicita completar una tarea
+
+### USER
+- Ver y gestionar sus propias tareas: marcar como completadas y solicitar aprobación al admin
+- Ver el historial de sus tareas con filtros por estado y proyecto
+- Acceder a todos los proyectos y ver sus detalles
+- Registrar movimientos de entrada/salida en proyectos y ver la gráfica de saldo
+- Participar en el chat de cualquier proyecto
+- Recibir notificaciones cuando le asignan una tarea, o cuando el admin aprueba o rechaza una
+
+---
+
+## Flujo principal de una tarea
+
+```
+ADMIN crea la tarea y la asigna a un usuario
+        ↓
+Usuario recibe notificación → la tarea aparece en "Mis Tareas" como "En progreso"
+        ↓
+Usuario termina el trabajo → hace clic en "Marcar completada" → estado: "Esperando aprobación"
+        ↓
+ADMIN recibe notificación → revisa la tarea → Aprueba o Rechaza
+        ↓
+Usuario recibe notificación con el resultado → tarea queda como "Completada" o vuelve a "En progreso"
+```
+
+---
 
 ## Integrantes
 
