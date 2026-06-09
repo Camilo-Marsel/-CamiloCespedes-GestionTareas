@@ -14,6 +14,40 @@ Sistema web fullstack para gestionar proyectos, tareas, equipos y comunicación 
 
 ---
 
+## Capturas
+
+### Login
+![Login](docs/screenshots/login.png)
+
+### Tareas — vista ADMIN
+![Tareas Admin](docs/screenshots/tareas-admin.png)
+
+### Nueva tarea — modal
+![Nueva Tarea](docs/screenshots/nueva-tarea.png)
+
+### Proyectos
+![Proyectos](docs/screenshots/proyectos.png)
+
+### Usuarios
+![Usuarios](docs/screenshots/usuarios.png)
+
+### Historial de Tareas
+![Historial](docs/screenshots/historial.png)
+
+### Mis Tareas — vista USER
+![Mis Tareas](docs/screenshots/mis-tareas.png)
+
+### Chat — vista ADMIN
+![Chat Admin](docs/screenshots/chat-admin.png)
+
+### Chat — vista USER
+![Chat Usuario](docs/screenshots/chat-usuario.png)
+
+### Notificaciones
+![Notificaciones](docs/screenshots/notificaciones.png)
+
+---
+
 ## Credenciales de acceso
 
 | Rol   | Correo                        | Contraseña |
@@ -29,7 +63,7 @@ Sistema web fullstack para gestionar proyectos, tareas, equipos y comunicación 
 ## Funcionalidades
 
 ### Gestión de tareas
-- **Tareas (ADMIN)** — crear, asignar, aprobar y rechazar tareas; vista kanban con filtros por estado y prioridad
+- **Tareas (ADMIN)** — crear, asignar, aprobar y rechazar tareas; tabla con filtros por estado y prioridad
 - **Mis Tareas (USER)** — ver las tareas propias; solicitar completado cuando se termina el trabajo
 - **Estados de tarea** — `PENDING → IN_PROGRESS → COMPLETION_REQUESTED → COMPLETED`
 - **Prioridades** — `LOW`, `MEDIUM`, `HIGH` con indicadores visuales de color
@@ -53,7 +87,6 @@ Sistema web fullstack para gestionar proyectos, tareas, equipos y comunicación 
 
 ### Proyectos
 - Listado y creación de proyectos con descripción (creación solo para ADMIN)
-- Detalle por proyecto: saldo inicial y participantes
 
 ### Usuarios (ADMIN)
 - Panel de gestión: activar/desactivar, cambiar rol, ver correo y fecha de registro
@@ -66,23 +99,6 @@ Sistema web fullstack para gestionar proyectos, tareas, equipos y comunicación 
 - Tema **Fresh Tasks**: paleta esmeralda/verde `oklch(0.53 0.17 162)`, sidebar blanco
 - Página de login con panel decorativo que describe el sistema
 - Totalmente responsivo
-
----
-
-## Capturas
-
-> Las capturas se toman desde el despliegue en Vercel con los datos sembrados por el script `seed.ts`.
-
-| Pantalla | Ruta |
-|---|---|
-| Login | `/login` |
-| Tareas (ADMIN) | `/tasks` |
-| Mis Tareas (USER) | `/my-tasks` |
-| Historial | `/historial` |
-| Proyectos | `/projects` |
-| Chat | `/chat` |
-| Usuarios | `/users` |
-| Campana de notificaciones | Clic en el ícono del sidebar |
 
 ---
 
@@ -113,11 +129,10 @@ npm install
 
 # 3. Crear archivo .env en la raíz
 DATABASE_URL="postgresql://usuario:contraseña@host:6543/postgres?pgbouncer=true"
-DATABASE_URL_SCHEMA="postgresql://usuario:contraseña@host:5432/postgres"
 JWT_SECRET="tu-secreto-aqui"
 
 # 4. Crear las tablas en la base de datos (usar puerto 5432 — Session Pooler)
-DATABASE_URL="$DATABASE_URL_SCHEMA" npx prisma db push
+DATABASE_URL="postgresql://usuario:contraseña@host:5432/postgres" npx prisma db push
 
 # 5. Cargar datos de prueba (5 usuarios, 3 proyectos, 24 tareas, 12 mensajes de chat)
 npx tsx prisma/seed.ts
@@ -144,7 +159,7 @@ app/
     users/              # Gestión de usuarios — ADMIN
   api/
     auth/               # login, logout, me
-    tasks/              # CRUD tareas + acciones (assign, approve, reject, request_completion)
+    tasks/              # CRUD + acciones (assign, approve, reject, request_completion)
     projects/           # CRUD proyectos
     users/              # GET y PUT usuarios
     notifications/      # GET notificaciones, PUT marcar leídas
@@ -177,8 +192,8 @@ User ──── crea ──→ Project ──── tiene ──→ Task ─�
 
 - **User** — rol `ADMIN` o `USER`, puede estar deshabilitado o eliminado (soft delete)
 - **Project** — agrupa tareas y mensajes de chat
-- **Task** — tiene estado, prioridad, asignado, aprobado por y fechas
-- **Notification** — tipo (`TASK_ASSIGNED`, `COMPLETION_REQUESTED`, `TASK_APPROVED`, `TASK_REJECTED`), leída o no
+- **Task** — estado, prioridad, asignado, aprobado por y fechas
+- **Notification** — tipo (`TASK_ASSIGNED`, `COMPLETION_REQUESTED`, `TASK_APPROVED`, `TASK_REJECTED`)
 - **ChatMessage** — mensaje de texto ligado a un proyecto y un autor
 
 ---
@@ -187,7 +202,7 @@ User ──── crea ──→ Project ──── tiene ──→ Task ─�
 
 | Variable | Descripción |
 |---|---|
-| `DATABASE_URL` | Connection string de Supabase (Transaction Pooler, puerto 6543) para la app |
+| `DATABASE_URL` | Connection string de Supabase (Transaction Pooler, puerto 6543) |
 | `JWT_SECRET` | Secreto para firmar los tokens JWT |
 
 ---
@@ -195,6 +210,6 @@ User ──── crea ──→ Project ──── tiene ──→ Task ─�
 ## Notas técnicas
 
 - **`proxy.ts`** en lugar de `middleware.ts`: Next.js 16 renombró el archivo de middleware.
-- **Puerto 5432 para migraciones**: el Transaction Pooler (6543) no soporta comandos DDL; usar el Session Pooler (5432) solo para `prisma db push`.
+- **Puerto 5432 para migraciones**: el Transaction Pooler (6543) no soporta DDL; usar el Session Pooler (5432) solo para `prisma db push`.
 - **Polling en lugar de WebSockets**: notificaciones cada 20 s, chat cada 3 s — suficiente para un proyecto académico sin infraestructura de sockets.
 - **Soft delete en usuarios**: los usuarios se marcan como `deleted: true` en lugar de eliminarse físicamente para preservar la integridad referencial.
