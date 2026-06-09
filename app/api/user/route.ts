@@ -11,6 +11,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         image: user.image,
         email: user.email,
         role: user.role,
+        password: user.password || '',
       },
     });
     return NextResponse.json({ user: createdUser }, { status: 201 });

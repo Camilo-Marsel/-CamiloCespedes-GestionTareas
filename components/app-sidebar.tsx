@@ -1,12 +1,10 @@
 'use client';
 
 import * as React from 'react';
-
-import { NavDocuments } from '@/components/nav-documents';
-import { NavMain } from '@/components/nav-main';
-import { NavSecondary } from '@/components/nav-secondary';
 import { NavUser } from '@/components/nav-user';
 import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   Sidebar,
   SidebarContent,
@@ -18,162 +16,75 @@ import {
 } from '@/components/ui/sidebar';
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
-  DashboardSquare01Icon,
-  Menu01Icon,
   ChartHistogramIcon,
   Folder01Icon,
   UserGroupIcon,
-  Camera01Icon,
-  File01Icon,
-  Settings05Icon,
-  HelpCircleIcon,
-  SearchIcon,
-  Database01Icon,
-  Analytics01Icon,
-  CommandIcon,
 } from '@hugeicons/core-free-icons';
+import { SessionUser } from '@/lib/auth';
 
-const data = {
-  user: {
-    name: 'shadcn',
-    email: 'm@example.com',
-    avatar: '/avatars/shadcn.jpg',
-  },
-  navSecondary: [
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  user: SessionUser;
+}
+
+export function AppSidebar({ user, ...props }: AppSidebarProps) {
+  const pathname = usePathname();
+
+  const navItems = [
     {
-      title: 'Dashboard',
-      url: '/dashboard',
-      icon: <HugeiconsIcon icon={DashboardSquare01Icon} strokeWidth={2} />,
-    },
-    {
-      title: 'Pedidos',
-      url: '/orders',
-      icon: <HugeiconsIcon icon={Menu01Icon} strokeWidth={2} />,
-    },
-    {
-      title: 'Productos',
-      url: '/products',
+      title: 'Transacciones',
+      url: '/transactions',
       icon: <HugeiconsIcon icon={ChartHistogramIcon} strokeWidth={2} />,
+      roles: ['ADMIN', 'USER'],
     },
     {
-      title: 'Clientes',
-      url: '/customers',
+      title: 'Proyectos',
+      url: '/projects',
       icon: <HugeiconsIcon icon={Folder01Icon} strokeWidth={2} />,
+      roles: ['ADMIN', 'USER'],
     },
     {
-      title: 'Proveedores',
-      url: '/suppliers',
-      icon: <HugeiconsIcon icon={UserGroupIcon} strokeWidth={2} />,
-    },
-    {
-      title: 'Users',
+      title: 'Usuarios',
       url: '/users',
-      icon: <HugeiconsIcon icon={CommandIcon} strokeWidth={2} />,
+      icon: <HugeiconsIcon icon={UserGroupIcon} strokeWidth={2} />,
+      roles: ['ADMIN'],
     },
-  ],
-  navClouds: [
-    {
-      title: 'Capture',
-      icon: <HugeiconsIcon icon={Camera01Icon} strokeWidth={2} />,
-      isActive: true,
-      url: '#',
-      items: [
-        {
-          title: 'Active Proposals',
-          url: '#',
-        },
-        {
-          title: 'Archived',
-          url: '#',
-        },
-      ],
-    },
-    {
-      title: 'Proposal',
-      icon: <HugeiconsIcon icon={File01Icon} strokeWidth={2} />,
-      url: '#',
-      items: [
-        {
-          title: 'Active Proposals',
-          url: '#',
-        },
-        {
-          title: 'Archived',
-          url: '#',
-        },
-      ],
-    },
-    {
-      title: 'Prompts',
-      icon: <HugeiconsIcon icon={File01Icon} strokeWidth={2} />,
-      url: '#',
-      items: [
-        {
-          title: 'Active Proposals',
-          url: '#',
-        },
-        {
-          title: 'Archived',
-          url: '#',
-        },
-      ],
-    },
-  ],
-  navMain: [
-    {
-      title: 'Settings',
-      url: '#',
-      icon: <HugeiconsIcon icon={Settings05Icon} strokeWidth={2} />,
-    },
-    {
-      title: 'Get Help',
-      url: '#',
-      icon: <HugeiconsIcon icon={HelpCircleIcon} strokeWidth={2} />,
-    },
-    {
-      title: 'Search',
-      url: '#',
-      icon: <HugeiconsIcon icon={SearchIcon} strokeWidth={2} />,
-    },
-  ],
-  documents: [
-    {
-      name: 'Data Library',
-      url: '#',
-      icon: <HugeiconsIcon icon={Database01Icon} strokeWidth={2} />,
-    },
-    {
-      name: 'Reports',
-      url: '#',
-      icon: <HugeiconsIcon icon={Analytics01Icon} strokeWidth={2} />,
-    },
-    {
-      name: 'Word Assistant',
-      url: '#',
-      icon: <HugeiconsIcon icon={File01Icon} strokeWidth={2} />,
-    },
-  ],
-};
+  ];
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const visibleItems = navItems.filter((item) => item.roles.includes(user.role));
+
   return (
     <Sidebar collapsible='offcanvas' {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild className='data-[slot=sidebar-menu-button]:p-1.5!'>
-              <a href='#'>
-                <Image src='/LogoGreen.png' alt='Logo' width={72} height={72} className='' />
-              </a>
+              <Link href='/transactions'>
+                <Image src='/LogoGreen.png' alt='Logo' width={72} height={72} />
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavSecondary items={data.navSecondary} />
+        <SidebarMenu className='px-2 py-4 gap-1'>
+          {visibleItems.map((item) => (
+            <SidebarMenuItem key={item.url}>
+              <SidebarMenuButton
+                asChild
+                isActive={pathname === item.url}
+                className='gap-3 px-3 py-2'
+              >
+                <Link href={item.url}>
+                  {item.icon}
+                  <span>{item.title}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={{ name: user.name, email: user.email, avatar: user.image || '' }} />
       </SidebarFooter>
     </Sidebar>
   );
