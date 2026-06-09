@@ -27,7 +27,7 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
   const navItems = [
     { title: 'Tareas', url: '/tasks', icon: TaskDone01Icon, roles: ['ADMIN'] },
     { title: 'Mis Tareas', url: '/my-tasks', icon: ListViewIcon, roles: ['USER'] },
-    { title: 'Transacciones', url: '/transactions', icon: ChartHistogramIcon, roles: ['ADMIN', 'USER'] },
+    { title: 'Historial', url: '/historial', icon: ChartHistogramIcon, roles: ['ADMIN', 'USER'] },
     { title: 'Proyectos', url: '/projects', icon: Folder01Icon, roles: ['ADMIN', 'USER'] },
     { title: 'Chat', url: '/chat', icon: BubbleChatIcon, roles: ['ADMIN', 'USER'] },
     { title: 'Usuarios', url: '/users', icon: UserGroupIcon, roles: ['ADMIN'] },
