@@ -12,13 +12,16 @@ export async function proxy(request: NextRequest) {
   const token = request.cookies.get(COOKIE)?.value;
   const user = token ? await verifySession(token) : null;
 
-  if (!user) {
-    return NextResponse.redirect(new URL('/login', request.url));
+  if (!user) return NextResponse.redirect(new URL('/login', request.url));
+
+  // Solo ADMIN puede acceder a /users y /tasks
+  if ((pathname.startsWith('/users') || pathname.startsWith('/tasks')) && user.role !== 'ADMIN') {
+    return NextResponse.redirect(new URL('/my-tasks', request.url));
   }
 
-  // Solo ADMINs pueden acceder a /users
-  if (pathname.startsWith('/users') && user.role !== 'ADMIN') {
-    return NextResponse.redirect(new URL('/transactions', request.url));
+  // Redirigir a /tasks si ADMIN intenta ir a /my-tasks
+  if (pathname.startsWith('/my-tasks') && user.role === 'ADMIN') {
+    return NextResponse.redirect(new URL('/tasks', request.url));
   }
 
   return NextResponse.next();
