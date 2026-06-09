@@ -3,7 +3,7 @@ import { verifySession, COOKIE } from '@/lib/auth';
 
 const PUBLIC_PATHS = ['/login', '/api/auth'];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const isPublic = PUBLIC_PATHS.some((p) => pathname.startsWith(p));
@@ -16,7 +16,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // Only ADMINs can access /users
+  // Solo ADMINs pueden acceder a /users
   if (pathname.startsWith('/users') && user.role !== 'ADMIN') {
     return NextResponse.redirect(new URL('/transactions', request.url));
   }
