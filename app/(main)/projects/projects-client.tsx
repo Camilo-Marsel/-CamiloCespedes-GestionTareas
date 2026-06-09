@@ -2,16 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { Add01Icon, Folder01Icon } from '@hugeicons/core-free-icons';
 
 type Project = {
   id: string;
@@ -64,48 +60,62 @@ export default function ProjectsClient({ isAdmin }: { isAdmin: boolean }) {
     }
   }
 
-  // Compute current balance per project based on movements is handled in transactions
-  // Here we show the initial balance
-  const getBalance = (project: Project) => project.initialBalance;
-
   return (
-    <div className='container mx-auto py-10 px-6'>
-      <div className='flex flex-row justify-between items-start mb-8'>
-        <div>
-          <h2 className='text-3xl font-bold tracking-tight'>Proyectos</h2>
-          <p className='text-muted-foreground mt-1'>Gestiona los proyectos del sistema.</p>
+    <div className='container mx-auto py-8 px-6 max-w-6xl'>
+      {/* Header */}
+      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8'>
+        <div className='flex items-center gap-3'>
+          <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10'>
+            <HugeiconsIcon icon={Folder01Icon} strokeWidth={2} className='size-5 text-primary' />
+          </div>
+          <div>
+            <h1 className='text-2xl font-bold tracking-tight'>Proyectos</h1>
+            <p className='text-sm text-muted-foreground'>{projects.length} proyecto{projects.length !== 1 ? 's' : ''} registrado{projects.length !== 1 ? 's' : ''}</p>
+          </div>
         </div>
         {isAdmin && (
-          <Button onClick={() => setOpen(true)}>+ Agregar proyecto</Button>
+          <Button onClick={() => setOpen(true)} className='gap-2'>
+            <HugeiconsIcon icon={Add01Icon} strokeWidth={2} className='size-4' />
+            Nuevo proyecto
+          </Button>
         )}
       </div>
 
       {loading ? (
-        <div className='text-center py-20 text-muted-foreground'>Cargando proyectos...</div>
+        <div className='text-center py-20 text-sm text-muted-foreground'>Cargando proyectos...</div>
       ) : projects.length === 0 ? (
-        <div className='text-center py-20 text-muted-foreground'>No hay proyectos registrados.</div>
+        <div className='flex flex-col items-center justify-center py-20 gap-3'>
+          <div className='flex h-14 w-14 items-center justify-center rounded-2xl bg-muted'>
+            <HugeiconsIcon icon={Folder01Icon} strokeWidth={1.5} className='size-7 text-muted-foreground' />
+          </div>
+          <p className='text-sm text-muted-foreground'>No hay proyectos registrados aún.</p>
+          {isAdmin && (
+            <Button onClick={() => setOpen(true)} variant='outline' size='sm'>Crear el primero</Button>
+          )}
+        </div>
       ) : (
-        <div className='rounded-md border overflow-hidden'>
+        <div className='rounded-xl border bg-card shadow-sm overflow-hidden'>
+          <div className='px-5 py-4 border-b border-border/60'>
+            <h2 className='text-sm font-semibold'>Todos los proyectos</h2>
+          </div>
           <table className='w-full text-sm'>
-            <thead className='bg-muted/50'>
-              <tr>
-                <th className='text-left px-4 py-3 font-medium'>ID</th>
-                <th className='text-left px-4 py-3 font-medium'>Nombre</th>
-                <th className='text-right px-4 py-3 font-medium'>Saldo inicial</th>
-                <th className='text-left px-4 py-3 font-medium'>Creado por</th>
-                <th className='text-left px-4 py-3 font-medium'>Fecha</th>
+            <thead>
+              <tr className='border-b border-border/40 bg-muted/30'>
+                <th className='text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide'>ID</th>
+                <th className='text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide'>Nombre</th>
+                <th className='text-right px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide'>Saldo inicial</th>
+                <th className='text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide'>Creado por</th>
+                <th className='text-left px-5 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide'>Fecha</th>
               </tr>
             </thead>
-            <tbody>
-              {projects.map((p, i) => (
-                <tr key={p.id} className={i % 2 === 0 ? 'bg-background' : 'bg-muted/20'}>
-                  <td className='px-4 py-3 font-mono text-xs text-muted-foreground'>{p.id.slice(0, 8)}...</td>
-                  <td className='px-4 py-3 font-medium'>{p.name}</td>
-                  <td className='px-4 py-3 text-right font-mono'>{getBalance(p)}</td>
-                  <td className='px-4 py-3'>{p.createdBy.name}</td>
-                  <td className='px-4 py-3 text-muted-foreground'>
-                    {new Date(p.createdAt).toLocaleDateString('es-CO')}
-                  </td>
+            <tbody className='divide-y divide-border/30'>
+              {projects.map((p) => (
+                <tr key={p.id} className='hover:bg-muted/20 transition-colors'>
+                  <td className='px-5 py-3.5 font-mono text-xs text-muted-foreground'>{p.id.slice(0, 8)}...</td>
+                  <td className='px-5 py-3.5 font-semibold'>{p.name}</td>
+                  <td className='px-5 py-3.5 text-right font-semibold tabular-nums text-primary'>{p.initialBalance}</td>
+                  <td className='px-5 py-3.5 text-muted-foreground'>{p.createdBy.name}</td>
+                  <td className='px-5 py-3.5 text-muted-foreground'>{new Date(p.createdAt).toLocaleDateString('es-CO')}</td>
                 </tr>
               ))}
             </tbody>
@@ -114,19 +124,20 @@ export default function ProjectsClient({ isAdmin }: { isAdmin: boolean }) {
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
+        <DialogContent className='max-w-sm'>
           <DialogHeader>
-            <DialogTitle>Agregar proyecto</DialogTitle>
+            <DialogTitle>Nuevo proyecto</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleCreate} className='flex flex-col gap-4'>
+          <form onSubmit={handleCreate} className='flex flex-col gap-4 pt-2'>
             <div className='flex flex-col gap-2'>
               <Label htmlFor='proj-name'>Nombre del proyecto</Label>
               <Input
                 id='proj-name'
-                placeholder='Nombre del proyecto'
+                placeholder='Ej: Proyecto Alpha'
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
+                className='bg-card'
               />
             </div>
             <div className='flex flex-col gap-2'>
@@ -137,12 +148,11 @@ export default function ProjectsClient({ isAdmin }: { isAdmin: boolean }) {
                 min='0'
                 value={initialBalance}
                 onChange={(e) => setInitialBalance(e.target.value)}
+                className='bg-card'
               />
             </div>
-            <DialogFooter>
-              <Button type='button' variant='outline' onClick={() => setOpen(false)}>
-                Cancelar
-              </Button>
+            <DialogFooter className='pt-2'>
+              <Button type='button' variant='outline' onClick={() => setOpen(false)}>Cancelar</Button>
               <Button type='submit' disabled={saving}>
                 {saving ? 'Creando...' : 'Crear proyecto'}
               </Button>
